@@ -1,0 +1,22 @@
+body{
+    background-color: #9a6c6c;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: medium;
+}
+
+.subtle{
+    font-size: medium;
+    font-style: italic;
+    color: purple;
+}
+
+h1{
+    color: pink;
+    border: 2px solid;
+    border-radius: 2px solid purple;
+}
+
+#imagen1{
+    width: 300px;
+    height: 300px;
+}
