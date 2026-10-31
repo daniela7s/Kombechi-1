@@ -6,7 +6,7 @@
     "descripcion": "Bebida fermentada, cítrica y refrescante.",
     "precio": 12000,
     "moneda": "COP",
-    "imagen": "",
+    "imagen": "/assets/img/Kolimonyjengibre.png",
     "destacado": true
   },
   {
@@ -16,7 +16,7 @@
     "descripcion": "Una combinación frutal con un toque ácido.",
     "precio": 12000,
     "moneda": "COP",
-    "imagen": "",
+    "imagen": "/assets/img/Kofrutosrojos.jpg",
     "destacado": true
   },
   {
@@ -26,7 +26,7 @@
     "descripcion": "Perfil tropical, fresco y afrutado.",
     "precio": 12000,
     "moneda": "COP",
-    "imagen": "",
+    "imagen": "/assets/img/Kopina.jpg",
     "destacado": true
   },
   {
@@ -36,7 +36,7 @@
     "descripcion": "Bebida fermentada de sabor suave y cremoso.",
     "precio": 10000,
     "moneda": "COP",
-    "imagen": "",
+    "imagen": "/assets/img/Kenatural.png",
     "destacado": false
   },
   {
@@ -46,17 +46,17 @@
     "descripcion": "Una versión frutal con sabor a fresa.",
     "precio": 11000,
     "moneda": "COP",
-    "imagen": "",
+    "imagen": "/assets/img/Kefresa.jpg",
     "destacado": false
   },
   {
     "id": "6",
-    "nombre": "Kéfir de frutos rojos",
+    "nombre": "Kéfir de maracuyá",
     "categoria": "Kéfir",
-    "descripcion": "Alternativa frutal para ampliar el catálogo.",
+    "descripcion": "Kéfir artesanal, suave y cremoso, con sabor tropical a maracuyá.",
     "precio": 11000,
     "moneda": "COP",
-    "imagen": "",
+    "imagen": "/assets/img/Kemaracuya.png",
     "destacado": false
   }
 ]
