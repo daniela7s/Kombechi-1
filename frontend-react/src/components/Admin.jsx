@@ -1,15 +1,26 @@
-import React, { useEffect, useState } from "react";
-import { pedir } from "./api";
-import "./admin.css";
+import React, { useEffect, useRef, useState } from "react";
+import { pedir } from "../api";
+import "../admin.css";
 
 function precioCOP(precio) {
   return Number(precio || 0).toLocaleString("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 });
 }
 
 export default function Admin() {
+  // UseRef permite desplazar la página hasta el formulario sin buscarlo con querySelector.
+  const formularioProductoRef = useRef(null);
   const [token, setToken] = useState(() => sessionStorage.getItem("kombechiToken") || "");
   const [usuario, setUsuario] = useState("");
   const [password, setPassword] = useState("");
+  // React conserva los valores del formulario y los campos los muestran desde este estado.
+  const [formularioProducto, setFormularioProducto] = useState({
+    nombre: "",
+    categoria: "Kombucha",
+    descripcion: "",
+    precio: "",
+    imagen: "",
+    destacado: false
+  });
   const [productos, setProductos] = useState([]);
   const [pedidos, setPedidos] = useState([]);
   const [productoEditado, setProductoEditado] = useState(null);
@@ -76,15 +87,13 @@ export default function Admin() {
 
   async function guardarProducto(evento) {
     evento.preventDefault();
-    const formulario = evento.currentTarget;
-    const datos = new FormData(formulario);
     const producto = {
-      nombre: datos.get("nombre").trim(),
-      categoria: datos.get("categoria"),
-      descripcion: datos.get("descripcion").trim(),
-      precio: Number(datos.get("precio")),
-      imagen: datos.get("imagen").trim(),
-      destacado: datos.has("destacado")
+      nombre: formularioProducto.nombre.trim(),
+      categoria: formularioProducto.categoria,
+      descripcion: formularioProducto.descripcion.trim(),
+      precio: Number(formularioProducto.precio),
+      imagen: formularioProducto.imagen.trim(),
+      destacado: formularioProducto.destacado
     };
     setEnviando(true);
     setMensajePanel("");
@@ -94,7 +103,7 @@ export default function Admin() {
         token,
         body: JSON.stringify(producto)
       });
-      formulario.reset();
+      setFormularioProducto({ nombre: "", categoria: "Kombucha", descripcion: "", precio: "", imagen: "", destacado: false });
       setProductoEditado(null);
       setMensajePanel(productoEditado ? "Producto actualizado." : "Producto agregado.");
       await cargarDatos(token);
@@ -107,18 +116,21 @@ export default function Admin() {
 
   function editarProducto(producto) {
     setProductoEditado(producto._id);
-    document.querySelector("#formulario-producto").elements.nombre.value = producto.nombre;
-    document.querySelector("#formulario-producto").elements.categoria.value = producto.categoria;
-    document.querySelector("#formulario-producto").elements.descripcion.value = producto.descripcion;
-    document.querySelector("#formulario-producto").elements.precio.value = producto.precio;
-    document.querySelector("#formulario-producto").elements.imagen.value = producto.imagen || "";
-    document.querySelector("#formulario-producto").elements.destacado.checked = Boolean(producto.destacado);
-    document.querySelector("#formulario-producto").scrollIntoView({ behavior: "smooth" });
+    // Al actualizar el estado, React llena los campos controlados con los datos del producto seleccionado para editar
+    setFormularioProducto({
+      nombre: producto.nombre,
+      categoria: producto.categoria,
+      descripcion: producto.descripcion,
+      precio: String(producto.precio),
+      imagen: producto.imagen || "",
+      destacado: Boolean(producto.destacado)
+    });
+    formularioProductoRef.current?.scrollIntoView({ behavior: "smooth" });
   }
 
   function cancelarEdicion() {
     setProductoEditado(null);
-    document.querySelector("#formulario-producto")?.reset();
+    setFormularioProducto({ nombre: "", categoria: "Kombucha", descripcion: "", precio: "", imagen: "", destacado: false });
   }
 
   async function eliminarProducto(id) {
@@ -198,13 +210,14 @@ export default function Admin() {
                 {cargando && <p className="nota">Cargando información...</p>}
                 <section id="gestion-productos" className="seccion-admin">
                   <div className="titulo-seccion"><div><h3>Productos</h3><p className="ayuda-seccion">Los productos se guardan en MongoDB.</p></div></div>
-                  <form id="formulario-producto" className="formulario-producto" onSubmit={guardarProducto}>
-                    <label>Nombre del producto<input name="nombre" required maxLength="70" placeholder="Ej. Kombucha de mango" /></label>
-                    <label>Categoría<select name="categoria" required defaultValue="Kombucha"><option value="Kombucha">Kombucha</option><option value="Kéfir">Kéfir</option></select></label>
-                    <label className="campo-descripcion">Descripción<textarea name="descripcion" rows="2" required maxLength="400" placeholder="Descripción breve del producto" /></label>
-                    <label>Precio<input name="precio" type="number" min="0" step="1" required placeholder="0" /></label>
-                    <label>URL de imagen <span>(opcional)</span><input name="imagen" type="text" placeholder="URL o ruta de imagen" /></label>
-                    <label className="casilla-destacado"><input name="destacado" type="checkbox" /> Mostrar en destacados</label>
+                  {/* Cada campo muestra y actualiza formularioProducto; React es la fuente de verdad. */}
+                  <form id="formulario-producto" ref={formularioProductoRef} className="formulario-producto" onSubmit={guardarProducto}>
+                    <label>Nombre del producto<input name="nombre" value={formularioProducto.nombre} onChange={(evento) => setFormularioProducto((actual) => ({ ...actual, nombre: evento.target.value }))} required maxLength="70" placeholder="Ej. Kombucha de mango" /></label>
+                    <label>Categoría<select name="categoria" value={formularioProducto.categoria} onChange={(evento) => setFormularioProducto((actual) => ({ ...actual, categoria: evento.target.value }))} required><option value="Kombucha">Kombucha</option><option value="Kéfir">Kéfir</option></select></label>
+                    <label className="campo-descripcion">Descripción<textarea name="descripcion" value={formularioProducto.descripcion} onChange={(evento) => setFormularioProducto((actual) => ({ ...actual, descripcion: evento.target.value }))} rows="2" required maxLength="400" placeholder="Descripción breve del producto" /></label>
+                    <label>Precio<input name="precio" type="number" value={formularioProducto.precio} onChange={(evento) => setFormularioProducto((actual) => ({ ...actual, precio: evento.target.value }))} min="0" step="1" required placeholder="0" /></label>
+                    <label>URL de imagen <span>(opcional)</span><input name="imagen" type="text" value={formularioProducto.imagen} onChange={(evento) => setFormularioProducto((actual) => ({ ...actual, imagen: evento.target.value }))} placeholder="URL o ruta de imagen" /></label>
+                    <label className="casilla-destacado"><input name="destacado" type="checkbox" checked={formularioProducto.destacado} onChange={(evento) => setFormularioProducto((actual) => ({ ...actual, destacado: evento.target.checked }))} /> Mostrar en destacados</label>
                     <div className="acciones-formulario"><button className="boton-tarjeta" type="submit" disabled={enviando}>{productoEditado ? "Guardar cambios" : "Agregar producto"}</button>{productoEditado && <button className="boton-secundario" type="button" onClick={cancelarEdicion}>Cancelar edición</button>}</div>
                   </form>
                   <div className="contenedor-tabla"><table><thead><tr><th>Nombre</th><th>Categoría</th><th>Descripción</th><th>Precio</th><th>Acciones</th></tr></thead>
