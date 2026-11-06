@@ -7,6 +7,7 @@ const conectarDB = require("./config/db");
 const productosRoutes = require("./routes/productosRoutes");
 const pedidosRoutes = require("./routes/pedidosRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const usersRoutes = require("./routes/usersRoutes");
 
 const app = express();
 const puerto = process.env.PORT || 4005;
@@ -20,6 +21,7 @@ app.use(express.json());
 app.use("/api/productos", productosRoutes);
 app.use("/api/pedidos", pedidosRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/usuarios", usersRoutes);
 app.use(express.static(frontendDist));
 
 app.get("/", (req, res) => {
