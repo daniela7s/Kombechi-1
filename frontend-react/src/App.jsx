@@ -1,38 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { pedir } from "./api";
-import ProductCard from "./ProductCard";
-import ContactForm from "./ContactForm";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import ProductCard from "./components/ProductCard";
+import ContactForm from "./components/ContactForm";
 import "./styles.css";
 
 const imagenes = "/assets/img/";
-
-function Header() {
-  return (
-    <header className="encabezado-tienda">
-      <a className="marca-logo" href="#inicio" aria-label="Kombechi, inicio">
-        <img src={`${imagenes}logo.png`} alt="Logo de Kombechi" />
-      </a>
-      <nav className="navegacion" aria-label="Navegación principal">
-        <a href="#inicio">Inicio</a><a href="#categorias">Categorías</a><a href="#catalogo">Productos</a><a href="#nosotros">Nosotros</a><a href="#contacto">Contacto</a>
-      </nav>
-      <a href="/admin.html" className="enlace-admin">Admin</a>
-    </header>
-  );
-}
-
-function Footer() {
-  return (
-    <footer className="pie-pagina">
-      <div className="marca-pie">
-        <a href="#inicio" aria-label="Volver al inicio"><img className="logo-pie" src={`${imagenes}logo.png`} alt="Logo de Kombechi" /></a>
-        <span className="firma-pie">by Alison S.</span>
-        <span>© 2026 · Todos los derechos reservados</span>
-      </div>
-      <div className="info-pie"><h3>Información</h3><a href="#catalogo">Ver catálogo</a><a href="#nosotros">Sobre nosotros</a></div>
-      <div className="info-pie"><h3>Contacto</h3><a href="#contacto">Escríbenos desde el formulario de pedidos</a></div>
-    </footer>
-  );
-}
 
 export default function App() {
   const [productos, setProductos] = useState([]);
@@ -42,6 +16,8 @@ export default function App() {
   const [categoria, setCategoria] = useState(() => new URLSearchParams(window.location.search).get("categoria") || "");
   const [orden, setOrden] = useState("destacados");
   const [productoSeleccionado, setProductoSeleccionado] = useState("");
+  // La referencia señala el contacto para desplazar la página sin querySelector.
+  const contactoRef = useRef(null);
 
   useEffect(() => {
     async function cargarProductos() {
@@ -74,7 +50,7 @@ export default function App() {
 
   function prepararPedido(nombreProducto) {
     setProductoSeleccionado(nombreProducto);
-    document.querySelector("#contacto")?.scrollIntoView({ behavior: "smooth" });
+    contactoRef.current?.scrollIntoView({ behavior: "smooth" });
   }
 
   function elegirCategoria(nombreCategoria) {
@@ -141,7 +117,10 @@ export default function App() {
           <div className="imagen-nosotros logo-nosotros"><img src={`${imagenes}logo.png`} alt="Logo de Kombechi" loading="lazy" /></div>
           <div className="contenido-nosotros"><span className="texto-superior">SOBRE NOSOTROS</span><h2>Fermentación artesanal con ciencia y cuidado.</h2><p>Kombechi es un emprendimiento de bebidas fermentadas que combina frescura, calidad y bioquímica aplicada. Elaboramos kombucha con SCOBY y kéfir con gránulos vivos para ofrecer sabores únicos, preparados con atención en cada etapa.</p></div>
         </section>
-        <ContactForm productoInicial={productoSeleccionado} alEnviar={() => setProductoSeleccionado("")} />
+        {/* El contenedor da a App una referencia React al elemento de contacto. */}
+        <div ref={contactoRef}>
+          <ContactForm productoInicial={productoSeleccionado} alEnviar={() => setProductoSeleccionado("")} />
+        </div>
       </main>
       <Footer />
     </>

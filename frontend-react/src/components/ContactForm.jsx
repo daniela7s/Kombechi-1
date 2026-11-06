@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { pedir } from "./api";
+import { pedir } from "../api";
 
 export default function ContactForm({ productoInicial = "", alEnviar }) {
   const [producto, setProducto] = useState(productoInicial);
