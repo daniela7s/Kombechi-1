@@ -1,3 +1,5 @@
 node_modules/
 frontend-react/dist/
-backend/.env
+**/.env
+**/.env.*
+!**/.env.example
