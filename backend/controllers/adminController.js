@@ -23,7 +23,7 @@ const iniciarSesion = async (req, res) => {
       return res.status(401).json({ mensaje: "Usuario o contraseña incorrectos" });
     }
 
-    const token = jwt.sign({ usuario }, process.env.JWT_SECRET, { expiresIn: "2h" });
+    const token = jwt.sign({ usuario, rol: "admin" }, process.env.JWT_SECRET, { expiresIn: "2h" });
 
     res.status(200).json({ mensaje: "Inicio de sesión correcto", token });
   } catch (error) {

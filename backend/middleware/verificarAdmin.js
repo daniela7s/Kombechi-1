@@ -10,7 +10,13 @@ const verificarAdmin = (req, res, next) => {
   const token = autorizacion.split(" ")[1];
 
   try {
-    req.admin = jwt.verify(token, process.env.JWT_SECRET);
+    const datosAdmin = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (datosAdmin.rol !== "admin") {
+      return res.status(401).json({ mensaje: "La sesión no es válida o ha vencido" });
+    }
+
+    req.admin = datosAdmin;
     next();
   } catch (error) {
     res.status(401).json({ mensaje: "La sesión no es válida o ha vencido" });

@@ -11,8 +11,16 @@ const obtenerPedidos = async (req, res) => {
 };
 
 const crearPedido = async (req, res) => {
+  const { nombre, correo, telefono, producto, cantidad, mensaje = "" } = req.body || {};
+  const correoValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(correo || "").trim());
+
+  if (!correoValido) {
+    return res.status(400).json({ mensaje: "Escribe un correo electrónico válido" });
+  }
+
   try {
-    const nuevoPedido = new Order(req.body);
+    // Solo se guardan los datos del pedido; el estado conserva el default "pendiente".
+    const nuevoPedido = new Order({ nombre, correo, telefono, producto, cantidad, mensaje });
     const pedidoGuardado = await nuevoPedido.save();
     res.status(201).json({ mensaje: "Pedido recibido", pedido: pedidoGuardado });
   } catch (error) {
@@ -21,6 +29,13 @@ const crearPedido = async (req, res) => {
 };
 
 const actualizarEstadoPedido = async (req, res) => {
+  const { estado } = req.body || {};
+  const estadosPermitidos = ["pendiente", "atendido"];
+
+  if (!estadosPermitidos.includes(estado)) {
+    return res.status(400).json({ mensaje: "El estado debe ser pendiente o atendido" });
+  }
+
   if (!mongoose.isValidObjectId(req.params.id)) {
     return res.status(400).json({ mensaje: "El id del pedido no es válido" });
   }
@@ -32,7 +47,7 @@ const actualizarEstadoPedido = async (req, res) => {
       return res.status(404).json({ mensaje: "Pedido no encontrado" });
     }
 
-    pedido.estado = req.body.estado;
+    pedido.estado = estado;
     const pedidoActualizado = await pedido.save();
     res.status(200).json(pedidoActualizado);
   } catch (error) {

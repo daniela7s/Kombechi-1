@@ -37,6 +37,7 @@ const iniciarServidor = async () => {
     });
   } catch (error) {
     console.log("Error al conectar con MongoDB:", error.message);
+    process.exit(1);
   }
 };
 

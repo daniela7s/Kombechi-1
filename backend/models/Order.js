@@ -35,6 +35,6 @@ const pedidoSchema = new mongoose.Schema({
     enum: ["pendiente", "atendido"],
     default: "pendiente"
   }
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model("Order", pedidoSchema, "Orders");
