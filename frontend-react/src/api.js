@@ -13,7 +13,9 @@ export async function pedir(ruta, opciones = {}) {
   const datos = await respuesta.json().catch(() => ({}));
 
   if (!respuesta.ok) {
-    throw new Error(datos.mensaje || "No se pudo completar la solicitud.");
+    const error = new Error(datos.mensaje || "No se pudo completar la solicitud.");
+    error.status = respuesta.status;
+    throw error;
   }
 
   return datos;

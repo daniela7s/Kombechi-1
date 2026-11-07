@@ -1,10 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { pedir } from "../api";
 import "../admin.css";
-
-function precioCOP(precio) {
-  return Number(precio || 0).toLocaleString("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 });
-}
+import { precioCOP } from "../utils/formatoCOP";
 
 export default function Admin() {
   // UseRef permite desplazar la página hasta el formulario sin buscarlo con querySelector.
@@ -29,7 +26,7 @@ export default function Admin() {
   const [errorLogin, setErrorLogin] = useState("");
   const [mensajePanel, setMensajePanel] = useState("");
 
-  async function cargarDatos(tokenActual) {
+  const cargarDatos = useCallback(async (tokenActual) => {
     setCargando(true);
     try {
       const [listaProductos, listaPedidos] = await Promise.all([
@@ -40,7 +37,7 @@ export default function Admin() {
       setPedidos(listaPedidos);
       return true;
     } catch (error) {
-      if (error.message.includes("sesión") || error.message.includes("Inicia sesión")) {
+      if (error.status === 401) {
         sessionStorage.removeItem("kombechiToken");
         setToken("");
         setErrorLogin(error.message);
@@ -50,11 +47,11 @@ export default function Admin() {
     } finally {
       setCargando(false);
     }
-  }
+  }, []);
 
   useEffect(() => {
     if (token) cargarDatos(token);
-  }, []);
+  }, [token, cargarDatos]);
 
   async function iniciarSesion(evento) {
     evento.preventDefault();
@@ -68,7 +65,6 @@ export default function Admin() {
       sessionStorage.setItem("kombechiToken", resultado.token);
       setToken(resultado.token);
       setPassword("");
-      await cargarDatos(resultado.token);
     } catch (error) {
       setErrorLogin(error.message);
     } finally {

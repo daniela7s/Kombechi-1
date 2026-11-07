@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { pedir } from "../api";
 
-export default function ContactForm({ productoInicial = "", alEnviar }) {
+export default function ContactForm({ productoInicial = "", versionProducto = 0, alEnviar }) {
   const [producto, setProducto] = useState(productoInicial);
   const [mensajeEstado, setMensajeEstado] = useState("");
   const [enviando, setEnviando] = useState(false);
 
   useEffect(() => {
     if (productoInicial) setProducto(productoInicial);
-  }, [productoInicial]);
+  }, [productoInicial, versionProducto]);
 
   async function enviarPedido(evento) {
     evento.preventDefault();
@@ -35,7 +35,6 @@ export default function ContactForm({ productoInicial = "", alEnviar }) {
       formulario.reset();
       setProducto("");
       alEnviar?.();
-      window.alert("Tu pedido fue enviado correctamente.");
     } catch (error) {
       setMensajeEstado(error.message || "No se pudo enviar el pedido. Inténtalo de nuevo.");
     } finally {

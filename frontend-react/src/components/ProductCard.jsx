@@ -1,12 +1,5 @@
 import React from "react";
-
-function precioCOP(precio) {
-  return Number(precio || 0).toLocaleString("es-CO", {
-    style: "currency",
-    currency: "COP",
-    maximumFractionDigits: 0
-  });
-}
+import { precioCOP } from "../utils/formatoCOP";
 
 export default function ProductCard({ producto, destacado = false, alPedir }) {
   const claseTarjeta = destacado ? "tarjeta-destacada" : "tarjeta-producto";

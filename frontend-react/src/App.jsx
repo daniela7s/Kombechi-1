@@ -15,7 +15,7 @@ export default function App() {
   const [busqueda, setBusqueda] = useState("");
   const [categoria, setCategoria] = useState(() => new URLSearchParams(window.location.search).get("categoria") || "");
   const [orden, setOrden] = useState("destacados");
-  const [productoSeleccionado, setProductoSeleccionado] = useState("");
+  const [productoSeleccionado, setProductoSeleccionado] = useState({ nombre: "", version: 0 });
   // La referencia señala el contacto para desplazar la página sin querySelector.
   const contactoRef = useRef(null);
 
@@ -49,7 +49,10 @@ export default function App() {
   const destacados = productos.filter((producto) => producto.destacado).slice(0, 3);
 
   function prepararPedido(nombreProducto) {
-    setProductoSeleccionado(nombreProducto);
+    setProductoSeleccionado((seleccionActual) => ({
+      nombre: nombreProducto,
+      version: seleccionActual.version + 1
+    }));
     contactoRef.current?.scrollIntoView({ behavior: "smooth" });
   }
 
@@ -119,7 +122,11 @@ export default function App() {
         </section>
         {/* El contenedor da a App una referencia React al elemento de contacto. */}
         <div ref={contactoRef}>
-          <ContactForm productoInicial={productoSeleccionado} alEnviar={() => setProductoSeleccionado("")} />
+          <ContactForm
+            productoInicial={productoSeleccionado.nombre}
+            versionProducto={productoSeleccionado.version}
+            alEnviar={() => setProductoSeleccionado((seleccionActual) => ({ ...seleccionActual, nombre: "" }))}
+          />
         </div>
       </main>
       <Footer />
