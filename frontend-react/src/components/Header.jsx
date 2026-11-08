@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router";
 
 const imagenes = "/assets/img/";
 
@@ -11,7 +12,8 @@ export default function Header() {
       <nav className="navegacion" aria-label="Navegación principal">
         <a href="#inicio">Inicio</a><a href="#categorias">Categorías</a><a href="#catalogo">Productos</a><a href="#nosotros">Nosotros</a><a href="#contacto">Contacto</a>
       </nav>
-      <a href="/admin.html" className="enlace-admin">Admin</a>
+      {/* Link cambia a la ruta del panel sin recargar el documento. */}
+      <Link to="/admin" className="enlace-admin">Admin</Link>
     </header>
   );
 }

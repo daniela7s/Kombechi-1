@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { BrowserRouter, Routes, Route } from "react-router";
 import { pedir } from "./api";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -8,7 +9,10 @@ import "./styles.css";
 
 const imagenes = "/assets/img/";
 
-export default function App() {
+// El panel se carga cuando se visita la ruta /admin.
+const Admin = lazy(() => import("./components/Admin"));
+
+function Tienda() {
   const [productos, setProductos] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
@@ -131,6 +135,20 @@ export default function App() {
       </main>
       <Footer />
     </>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      {/* Mientras se carga el panel, muestra este mensaje. */}
+      <Suspense fallback={<p>Cargando panel...</p>}>
+        <Routes>
+          <Route path="/" element={<Tienda />} />
+          <Route path="/admin" element={<Admin />} />
+        </Routes>
+      </Suspense>
+    </BrowserRouter>
   );
 }
 

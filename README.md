@@ -28,7 +28,6 @@ Kombechi-1/
 │   │   ├── admin.css     estilos del panel de administración
 │   │   ├── main.jsx      inicio de la aplicación React
 │   │   └── styles.css    estilos de la tienda
-│   ├── admin.html        entrada del panel de administración
 │   ├── index.html        entrada de la tienda
 │   └── vite.config.js    configuración de Vite y proxy a Express
 ├── .gitignore
@@ -94,7 +93,7 @@ npm install
 npm run dev
 ```
 
-Abre la dirección que muestra Vite, normalmente `http://localhost:5173`; el panel está en `/admin.html`. Vite reenvía las solicitudes `/api` al backend local en el puerto `4005`.
+Abre la dirección que muestra Vite, normalmente `http://localhost:5173`; el panel está en `/admin`. React Router cambia entre tienda y panel sin recargar la página. Vite reenvía las solicitudes `/api` al backend local en el puerto `4005`.
 
 Para revisar errores comunes de JavaScript y el uso de Hooks de React, desde `frontend-react/` ejecuta `npm run lint`.
 

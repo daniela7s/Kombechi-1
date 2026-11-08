@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Link } from "react-router";
 import { pedir } from "../api";
 import "../admin.css";
 import { precioCOP } from "../utils/formatoCOP";
@@ -167,8 +168,9 @@ export default function Admin() {
   return (
     <div className="admin-app">
       <header>
-        <a className="logo fuente-logo" href="/" aria-label="Kombechi, volver al inicio">Kombechi</a>
-        <nav className="enlaces-navegacion"><a href="/">← Volver a la tienda</a></nav>
+        {/* Estos Link vuelven a la tienda dentro de la SPA, sin recargar el HTML. */}
+        <Link className="logo fuente-logo" to="/" aria-label="Kombechi, volver al inicio">Kombechi</Link>
+        <nav className="enlaces-navegacion"><Link to="/">← Volver a la tienda</Link></nav>
         <span className="etiqueta-admin">Admin</span>
       </header>
 
@@ -194,7 +196,7 @@ export default function Admin() {
               <button onClick={cerrarSesion} className="boton-secundario" type="button">Cerrar sesión</button>
             </div>
             <div className="estructura-panel">
-              <aside className="menu-admin"><strong>Panel</strong><a href="#resumen">Resumen</a><a href="#gestion-productos">Productos</a><a href="#solicitudes">Pedidos</a><a href="/">Ver tienda</a></aside>
+              <aside className="menu-admin"><strong>Panel</strong><a href="#resumen">Resumen</a><a href="#gestion-productos">Productos</a><a href="#solicitudes">Pedidos</a>{/* Link navega a la tienda; los enlaces anteriores saltan a secciones del panel. */}<Link to="/">Ver tienda</Link></aside>
               <div className="contenido-admin">
                 <section id="resumen" className="encabezado-admin"><div><h2>Resumen de la tienda</h2><p>Gestiona los productos y revisa los pedidos de la tienda.</p></div></section>
                 <div className="cuadricula-resumen">
@@ -237,7 +239,7 @@ export default function Admin() {
           </section>
         )}
       </main>
-      <footer><span>© 2026 Kombechi</span><a href="/">Volver a la tienda</a></footer>
+      <footer><span>© 2026 Kombechi</span><Link to="/">Volver a la tienda</Link></footer>
     </div>
   );
 }
