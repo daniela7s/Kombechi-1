@@ -103,6 +103,6 @@ Para revisar errores comunes de JavaScript y el uso de Hooks de React, desde `fr
 - Guarda pedidos en MongoDB; los pedidos nuevos empiezan en `pendiente` y el administrador puede marcarlos como `atendido`.
 - Permite al administrador iniciar sesión, crear, editar y eliminar productos, y gestionar pedidos.
 - Incluye una API CRUD de usuarios.
-- Protege las rutas administrativas con un token temporal.
+- Protege las rutas administrativas con un token temporal.(generado con jwt)
 
 Los pedidos conservan el nombre del producto como texto para que el registro muestre qué pidió el cliente aunque el catálogo cambie después.
