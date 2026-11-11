@@ -1,5 +1,7 @@
+
 const mongoose = require("mongoose");
 const Order = require("../models/Order");
+const enviarNotificacionPedido = require("../config/mailer");
 
 const obtenerPedidos = async (req, res) => {
   try {
@@ -12,17 +14,42 @@ const obtenerPedidos = async (req, res) => {
 
 const crearPedido = async (req, res) => {
   const { nombre, correo, telefono, producto, cantidad, mensaje = "" } = req.body || {};
-  const correoValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(correo || "").trim());
+
+  const correoValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+    String(correo || "").trim()
+  );
 
   if (!correoValido) {
     return res.status(400).json({ mensaje: "Escribe un correo electrónico válido" });
   }
 
   try {
-    // Solo se guardan los datos del pedido; el estado conserva el default "pendiente".
-    const nuevoPedido = new Order({ nombre, correo, telefono, producto, cantidad, mensaje });
+    // Crear y guardar el pedido en MongoDB.
+    const nuevoPedido = new Order({
+      nombre,
+      correo,
+      telefono,
+      producto,
+      cantidad,
+      mensaje
+    });
+
     const pedidoGuardado = await nuevoPedido.save();
-    res.status(201).json({ mensaje: "Pedido recibido", pedido: pedidoGuardado });
+
+    // Enviar notificación por correo.
+    try {
+      await enviarNotificacionPedido(pedidoGuardado);
+      console.log("Correo enviado correctamente.");
+    } catch (errorCorreo) {
+      console.error("Error al enviar el correo:", errorCorreo.message);
+    }
+
+    // Responder al frontend.
+    res.status(201).json({
+      mensaje: "Pedido recibido",
+      pedido: pedidoGuardado
+    });
+
   } catch (error) {
     res.status(400).json({ mensaje: "No se pudo crear el pedido" });
   }
@@ -49,6 +76,7 @@ const actualizarEstadoPedido = async (req, res) => {
 
     pedido.estado = estado;
     const pedidoActualizado = await pedido.save();
+
     res.status(200).json(pedidoActualizado);
   } catch (error) {
     res.status(400).json({ mensaje: "No se pudo actualizar el pedido" });
