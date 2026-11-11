@@ -1,3 +1,4 @@
+
 require("dotenv").config();
 require("dns").setServers(["8.8.8.8", "8.8.4.4"]);
 
@@ -18,14 +19,28 @@ if (process.env.NODE_ENV === "production") {
 }
 
 app.use(express.json());
+
+// Rutas del backend
 app.use("/api/productos", productosRoutes);
 app.use("/api/pedidos", pedidosRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/usuarios", usersRoutes);
+
+// Archivos estáticos del frontend
 app.use(express.static(frontendDist));
 
-app.get("/", (req, res) => {
-  res.send("Servidor de Kombechi funcionando. Compila el frontend para mostrar la tienda.");
+// SPA fallback: entrega index.html para las rutas de React
+app.use((req, res, next) => {
+  if (
+    req.method !== "GET" ||
+    req.path === "/api" ||
+    req.path.startsWith("/api/") ||
+    !req.accepts("html")
+  ) {
+    return next();
+  }
+
+  res.sendFile(path.join(frontendDist, "index.html"));
 });
 
 const iniciarServidor = async () => {
