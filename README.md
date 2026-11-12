@@ -7,17 +7,16 @@ Kombechi es un emprendimiento de bebidas fermentadas que combina frescura, calid
 ```text
 Kombechi-1/
 ├── backend/
-│   ├── config/          conexión a MongoDB
-│   ├── controllers/     lógica de productos, pedidos, usuarios y administración
-│   ├── data/            referencia de productos
-│   ├── middleware/      protección de rutas administrativas
-│   ├── models/          esquemas de productos, pedidos y usuarios
-│   ├── routes/          rutas de la API
+│   ├── config/           conexión a MongoDB y envío de correo (Resend)
+│   ├── controllers/      lógica de productos, pedidos, usuarios y administración
+│   ├── middleware/       protección de rutas administrativas con JWT
+│   ├── models/           esquemas de productos, pedidos y usuarios
+│   ├── routes/           rutas de la API
 │   ├── .env.example      plantilla de configuración privada
 │   ├── generarHash.js    generador del hash de contraseña admin
 │   ├── package.json      comandos y dependencias del backend
 │   └── server.js         servidor Express
-├── frontend/             versión antigua conservada como referencia
+├── docs/                 build del frontend (versión publicada)
 ├── frontend-react/
 │   ├── public/           imágenes y archivos estáticos
 │   ├── src/
@@ -28,13 +27,14 @@ Kombechi-1/
 │   │   ├── admin.css     estilos del panel de administración
 │   │   ├── main.jsx      inicio de la aplicación React
 │   │   └── styles.css    estilos de la tienda
+│   ├── eslint.config.js  reglas de estilo y de Hooks de React
 │   ├── index.html        entrada de la tienda
 │   └── vite.config.js    configuración de Vite y proxy a Express
 ├── .gitignore
 └── README.md
 ```
 
-La versión activa de la página es `frontend-react/`. La carpeta `frontend/` se conserva como referencia y no es la que se ejecuta.
+La versión activa de la página es `frontend-react/`. La carpeta `docs/` guarda el build ya compilado que se publica.
 
 ## Requisitos
 
@@ -44,9 +44,12 @@ La versión activa de la página es `frontend-react/`. La carpeta `frontend/` se
 ## Tecnologías
 
 - **Frontend:** HTML, CSS, JavaScript, React y Vite.
+- **Enrutado:** React Router (cambia entre tienda y panel sin recargar).
 - **Backend:** Node.js, Express y Mongoose.
 - **Base de datos:** MongoDB.
 - **Acceso admin:** bcryptjs y JSON Web Token (JWT).
+- **Correo:** Resend (aviso de cada pedido por email).
+- **Seguridad:** express-rate-limit (bloquea la fuerza bruta en el login).
 
 ## Configurar el backend
 
@@ -65,7 +68,7 @@ Copy-Item .env.example .env
 
 En Git Bash puedes usar `cp .env.example .env`.
 
-En `backend/.env`, reemplaza los valores de ejemplo: pega tu URI privada en `MONGO_URI`, elige `ADMIN_USER` y define una clave larga y privada para `JWT_SECRET`. `PORT` ya tiene el valor local `4005`.
+En `backend/.env`, reemplaza los valores de ejemplo: pega tu URI privada en `MONGO_URI`, elige `ADMIN_USER`, define una clave larga y privada para `JWT_SECRET` y pega tu clave de Resend en `RESEND_API_KEY` (es la que envía el correo de cada pedido). `PORT` ya tiene el valor local `4005`.
 
 Para crear el hash de la contraseña administrativa:
 
@@ -97,12 +100,31 @@ Abre la dirección que muestra Vite, normalmente `http://localhost:5173`; el pan
 
 Para revisar errores comunes de JavaScript y el uso de Hooks de React, desde `frontend-react/` ejecuta `npm run lint`.
 
+## Desplegar
+
+El backend sirve el frontend ya compilado, así que primero hay que generar el build:
+
+```bash
+cd frontend-react
+npm run build
+```
+
+Esto crea `frontend-react/dist/`, que es lo que Express entrega en producción. En el servidor (por ejemplo Render) se configura:
+
+- **Build Command:** `cd frontend-react && npm install && npm run build`
+- **Start Command:** `cd backend && npm install && npm start`
+- **Variables de entorno:** las mismas de `.env` (`PORT`, `MONGO_URI`, `ADMIN_USER`, `ADMIN_PASSWORD_HASH`, `JWT_SECRET`, `RESEND_API_KEY`) y `NODE_ENV=production`.
+
+En producción el frontend y el backend comparten dominio: Express entrega `dist/` y el *fallback* devuelve `index.html` en las rutas de React. Por eso no hace falta el proxy de Vite ni hay problemas de CORS. La variable `NODE_ENV=production` activa `trust proxy`, necesario para que el límite de intentos del login vea la IP real del visitante.
+
 ## Funciones
 
 - Consulta productos en MongoDB y permite buscar, filtrar y ordenar el catálogo.
 - Guarda pedidos en MongoDB; los pedidos nuevos empiezan en `pendiente` y el administrador puede marcarlos como `atendido`.
+- Envía un correo de aviso con Resend cada vez que entra un pedido nuevo.
 - Permite al administrador iniciar sesión, crear, editar y eliminar productos, y gestionar pedidos.
-- Incluye una API CRUD de usuarios.
-- Protege las rutas administrativas con un token temporal.(generado con jwt)
+- Incluye una API CRUD de usuarios (por ahora sin interfaz en el panel).
+- Protege las rutas administrativas con un token temporal generado con JWT (válido 2 horas).
+- Limita a 5 intentos el inicio de sesión cada 15 minutos por IP.
 
 Los pedidos conservan el nombre del producto como texto para que el registro muestre qué pidió el cliente aunque el catálogo cambie después.
