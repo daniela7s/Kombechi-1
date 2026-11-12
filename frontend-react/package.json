@@ -7,7 +7,8 @@
     "dev": "vite",
     "lint": "eslint .",
     "build": "vite build",
-    "preview": "vite preview --host 0.0.0.0"
+    "preview": "vite preview --host 0.0.0.0",
+    "build:pages": "vite build --base=/Kombechi-1/ --outDir ../docs --emptyOutDir"
   },
   "dependencies": {
     "react": "^19.1.0",
